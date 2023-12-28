@@ -1,0 +1,21 @@
+{
+  "name": "majsoul-paipu",
+  "description": "majsoul-paipu",
+  "version": "1.0.0",
+  "author": "mayf",
+  "private": true,
+  "scripts": {
+    "start:api": "lerna run start --stream --scope=majsoul-api",
+    "build:api": "lerna run compile --stream --scope=majsoul-api",
+    "launch:api": "lerna run launch --stream --scope=majsoul-api"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^4.0.0"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0"
+  }
+}
