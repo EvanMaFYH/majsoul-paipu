@@ -2,7 +2,7 @@
   "apps": [{
     "name": "majsoul-api",
     "script": "production.js",
-    "cwd": "/Users/mayf/Documents/project-workspace/majsoul-paipu/packages/majsoul-api",
+    "cwd": "./",
     "exec_mode": "fork",
     "max_memory_restart": "1G",
     "autorestart": true,
