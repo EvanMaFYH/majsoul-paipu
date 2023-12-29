@@ -1,3 +1,9 @@
+###
+# Place your Prettier ignore content here
+
+###
+# .gitignore content is duplicated here due to https://github.com/prettier/prettier/issues/8506
+
 # Created by .ignore support plugin (hsz.mobi)
 ### Node template
 # Logs
@@ -70,7 +76,6 @@ typings/
 
 # Nuxt generate
 dist
-dist.*
 
 # vuepress build output
 .vuepress/dist
@@ -89,11 +94,3 @@ sw.*
 
 # Vim swap files
 *.swp
-
-# single lock file use npm
-yarn.lock
-*.history
-
-# output
-output/
-output.tar.gz

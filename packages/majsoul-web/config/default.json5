@@ -1,0 +1,17 @@
+{
+  server: {
+    port: 8361,
+    host: '0.0.0.0',
+  },
+  baseUrl: '',
+
+  // 服务端渲染
+  buildMode: {
+    mode: 'universal',
+  },
+  // 静态部署
+  //  buildMode: {
+  //    mode: 'spa',
+  //    target: 'static',
+  //  }
+}

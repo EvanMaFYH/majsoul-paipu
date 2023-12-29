@@ -1,0 +1,14 @@
+$primary-color: #173fa4;
+$border-color: #eee;
+$main-title-color: #333;
+$sub-title-color: #666;
+$tip-color: #999;
+$page-main-width: 1200px;
+
+:export {
+  primaryColor: $primary-color;
+  mainTitleColor: $main-title-color;
+  subTitleColor: $sub-title-color;
+  tipColor: $tip-color;
+  pageMainWidth: $page-main-width;
+}

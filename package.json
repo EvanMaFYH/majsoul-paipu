@@ -6,14 +6,26 @@
   "private": true,
   "scripts": {
     "start:api": "lerna run start --stream --scope=majsoul-api",
-    "build:api": "lerna run compile --stream --scope=majsoul-api",
-    "launch:api": "lerna run launch --stream --scope=majsoul-api"
+    "start:web": "lerna run start --stream --scope=majsoul-web",
+    "build:api": "lerna run compile --scope=majsoul-api",
+    "build:web:dev": "lerna run build:dev --scope=majsoul-web",
+    "launch:api": "lerna run launch --scope=majsoul-api",
+    "launch:web:prod": "lerna run launch:prod --scope=majsoul-web"
   },
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
-    "lerna": "^4.0.0"
+    "@nuxtjs/eslint-config": "^11.0.0",
+    "@nuxtjs/eslint-module": "^3.1.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.21.0",
+    "eslint-config-prettier": "^8.1.0",
+    "eslint-plugin-nuxt": "^2.0.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-vue": "^7.7.0",
+    "lerna": "^4.0.0",
+    "prettier": "^2.3.2"
   },
   "dependencies": {
     "crypto-js": "^4.2.0"

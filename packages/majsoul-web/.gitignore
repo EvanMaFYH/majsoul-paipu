@@ -70,7 +70,6 @@ typings/
 
 # Nuxt generate
 dist
-dist.*
 
 # vuepress build output
 .vuepress/dist
@@ -89,11 +88,3 @@ sw.*
 
 # Vim swap files
 *.swp
-
-# single lock file use npm
-yarn.lock
-*.history
-
-# output
-output/
-output.tar.gz
