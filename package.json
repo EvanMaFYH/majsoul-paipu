@@ -9,7 +9,9 @@
     "start:web": "lerna run start --stream --scope=majsoul-web",
     "build:api": "lerna run compile --scope=majsoul-api",
     "build:web:dev": "lerna run build:dev --scope=majsoul-web",
+    "build:web:prod": "lerna run build:prod --scope=majsoul-web",
     "launch:api": "lerna run launch --scope=majsoul-api",
+    "launch:web:dev": "lerna run launch:dev --scope=majsoul-web",
     "launch:web:prod": "lerna run launch:prod --scope=majsoul-web"
   },
   "workspaces": [
