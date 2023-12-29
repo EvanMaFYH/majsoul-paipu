@@ -14,6 +14,8 @@
   "dependencies": {
     "axios": "^0.19.2",
     "crypto-js": "^4.2.0",
+    "lodash.isarraybuffer": "^4.4.1",
+    "lodash.isbuffer": "^4.3.4",
     "protobufjs": "^6.11.3",
     "sockjs": "^0.3.24",
     "think-cache": "^1.0.0",

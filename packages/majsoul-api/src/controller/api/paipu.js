@@ -3,6 +3,7 @@ var protobuf = require("protobufjs")
 const WebSocket = require('ws')
 const uuidv4 = require("uuid/v4")
 const hmacSHA512 = require('crypto-js/hmac-sha256')
+const _isBuffer = require('lodash.isbuffer')
 let protobufRoot, protobufWrapper, ws, isConnect, majsoulHttp, versionInfo, clientVersionString, access_token
 let _index = 1
 let _inflightRequests = {}
@@ -62,6 +63,7 @@ module.exports = class extends think.Controller {
         }
     }
 
+    // 根据牌谱获取uuid
     formatUuid(uuid) {
         if (!uuid.startsWith('http')) {
             uuid = uuid.substring(uuid.indexOf('http'))
@@ -71,6 +73,7 @@ module.exports = class extends think.Controller {
         return uuid
     }
 
+    // 获取url的query参数
     getQueryString(url, key) {
         const reg = new RegExp('(^|&)' + key + '=([^&]*)(&|$)')
         const searchStr = url.split('?').pop()
@@ -81,6 +84,7 @@ module.exports = class extends think.Controller {
         return null
     }
 
+    // 请求雀魂相关json
     async majsoulRequest(url) {
         const res = await majsoulHttp.request(url)
         return res.data
@@ -107,6 +111,7 @@ module.exports = class extends think.Controller {
         return service.methods[name];
     }
 
+    // encode请求参数
     encodeRequest({methodName, payload}) {
         const currentIndex = _index++;
         const methodObj = this.lookupMethod(methodName);
@@ -122,9 +127,13 @@ module.exports = class extends think.Controller {
             methodName,
             typeObj: responseType,
         };
-        return Buffer.concat([Buffer.from([2, currentIndex & 0xff, currentIndex >> 8]), msg]);
+        return {
+            reqIndex: currentIndex,
+            buffer: Buffer.concat([Buffer.from([2, currentIndex & 0xff, currentIndex >> 8]), msg])
+        };
     }
 
+    // decode请求参数
     decodeMessage(buf) {
         const type = buf[0];
         const reqIndex = buf[1] | (buf[2] << 8);
@@ -150,12 +159,15 @@ module.exports = class extends think.Controller {
         };
     }
 
+    // 建立websocket连接
     createConnection() {
         return new Promise((resolve, reject) => {
             ws = new WebSocket(think.config('majsoulWssUrl'), {
                 perMessageDeflate: false
             })
             ws.on('error', (err) => {
+                console.log(error)
+                isConnect = false
                 reject(err)
             });
             ws.on('open', async function open() {
@@ -163,12 +175,14 @@ module.exports = class extends think.Controller {
                 resolve()
             });
             ws.on('message', (data) => {
-                messageQueue.push(data)
+                if (data && _isBuffer(data)) {
+                    messageQueue.push(this.decodeMessage(data))
+                }
             });
         })
     }
 
-    delay(time = 500) {
+    delay(time = 1000) {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve()
@@ -176,36 +190,39 @@ module.exports = class extends think.Controller {
         })
     }
 
+    // 发送websoket请求
     websocketRequest(methodName, payload) {
         return new Promise(async (resolve) => {
             const encodeData = this.encodeRequest({
                 methodName,
                 payload
             })
-            ws.send(encodeData)
-            let res = await this.getMessage()
-            if (res) {
-                res = this.decodeMessage(res)
-            }
-            if (res.payload && res.payload.error && res.payload.error.code) {
+            ws.send(encodeData.buffer)
+            let res = await this.getMessage(encodeData.reqIndex)
+            if (res && res.payload && res.payload.error && res.payload.error.code === 1004) {
                 this.majsoulLogin()
             }
             resolve(res ? res.payload : null)
         })
     }
 
-    async getMessage() {
+    // 获取websocket返回的值
+    async getMessage(reqIndex) {
         let delayTime = 0
-        while (messageQueue.length === 0) {
-            await this.delay()
-            delayTime += 500
-            if (delayTime > 50000) {
+        while (messageQueue.length === 0 || messageQueue.findIndex(item => item.reqIndex === reqIndex) === -1) {
+            await this.delay(200)
+            delayTime += 200
+            if (delayTime > 10000) {
                 return null
             }
         }
-        return messageQueue.shift()
+        const index = messageQueue.findIndex(item => item.reqIndex === reqIndex)
+        const result = messageQueue[index]
+        messageQueue.splice(index, 1)
+        return result
     }
 
+    // 雀魂账号密码登录
     async majsoulLogin() {
         const res = await this.websocketRequest('.lq.Lobby.login', {
             account: think.config('majsoulUserName'),
@@ -225,6 +242,7 @@ module.exports = class extends think.Controller {
         access_token = res.access_token
     }
 
+    // 雀魂token检测有效性
     async majsoulOauth2Check() {
         const res = await this.websocketRequest('.lq.Lobby.oauth2Check', {
             type: 0,
@@ -243,6 +261,7 @@ module.exports = class extends think.Controller {
     //         client_version: {resource: versionInfo.version},
     //         currency_platforms: [],
     //         client_version_string: clientVersionString,
+    //         tag: 'cn'
     //     })
     //     return res
     // }
