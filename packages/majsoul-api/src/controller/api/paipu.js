@@ -150,6 +150,29 @@ module.exports = class extends Base {
     }
   }
 
+  // 下载当前账号的牌谱
+  async downloadPaipu() {
+    let flag = true
+    let start = 0
+    let effectUuid = []
+    while (flag) {
+      const paipu = await this.getPaipu(1, 10, start)
+      if (paipu && paipu.length > 0) {
+        effectUuid = effectUuid.concat(
+          paipu
+            .filter(
+              (item) => util.toDate(item.start_time * 1000) >= '2023-05-06'
+            )
+            .map((item) => item.uuid)
+        )
+        start += 10
+      } else {
+        flag = false
+      }
+    }
+    fs.writeFileSync('文件地址', effectUuid.join('\n'))
+  }
+
   // 根据牌谱以及所有牌谱涉及到的用户导出excel
   async generateExcel(playerList, gameList) {
     const workbook = new ExcelJS.Workbook()
@@ -181,7 +204,10 @@ module.exports = class extends Base {
     let uuidList = []
     if (Array.isArray(paipuList) && paipuList.length > 0) {
       paipuList.forEach((uuid) => {
-        uuidList.push(this.formatUuid(uuid))
+        const formatUuid = this.formatUuid(uuid)
+        if (formatUuid) {
+          uuidList.push(formatUuid)
+        }
       })
     }
     return uuidList
@@ -189,12 +215,24 @@ module.exports = class extends Base {
 
   // 根据牌谱获取uuid
   formatUuid(uuid) {
-    if (!uuid.startsWith('http')) {
-      uuid = uuid.substring(uuid.indexOf('http'))
+    if (this.isUuid(uuid)) {
+      return uuid
     }
-    uuid = this.getQueryString(uuid, 'paipu')
-    uuid = uuid.split('_').shift()
+    if (uuid.includes('http')) {
+      if (!uuid.startsWith('http')) {
+        uuid = uuid.substring(uuid.indexOf('http'))
+      }
+      uuid = this.getQueryString(uuid, 'paipu')
+    }
+    if (uuid) {
+      uuid = uuid.split('_').shift()
+    }
     return uuid
+  }
+
+  // 判断是否是uuid格式
+  isUuid(str) {
+    return /^\S{6}-\S{8}-\S{4}-\S{4}-\S{4}-\S{12}$/.test(str)
   }
 
   // 获取url的query参数
@@ -424,6 +462,21 @@ module.exports = class extends Base {
       access_token,
     })
     return res ? res.has_account : false
+  }
+
+  // 获取牌谱
+  // 全部type=0友人场type=1匹配type=2比赛场type=4
+  async getPaipu(type = 0, count = 10, start = 0) {
+    const res = await this.websocketRequest('.lq.Lobby.fetchGameRecordList', {
+      start,
+      count,
+      type,
+    })
+    let list = []
+    if (res && res.record_list) {
+      list = res.record_list
+    }
+    return list
   }
 
   // async majsoulOauth2Login() {
