@@ -180,8 +180,9 @@ module.exports = class extends Base {
     const columns = playerList.map((item) => ({
       header: item.nickName,
       key: item.accountId,
+      width: 15,
     }))
-    columns.unshift({ header: '日期', key: 'date' })
+    columns.unshift({ header: '日期', key: 'date', width: 15 })
     worksheet.columns = columns
     gameList.forEach((item) => {
       const playScore = playerList
