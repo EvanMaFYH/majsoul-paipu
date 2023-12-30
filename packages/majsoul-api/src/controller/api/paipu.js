@@ -17,6 +17,7 @@ let protobufRoot,
 let _index = 1
 let _inflightRequests = {}
 let messageQueue = []
+let retryTimes = 0
 const DEVICE_INFO = {
   platform: 'pc',
   hardware: 'pc',
@@ -31,6 +32,10 @@ module.exports = class extends Base {
     return Promise.resolve(super.__before()).then(async () => {
       await this.init()
     })
+  }
+
+  __after() {
+    retryTimes = 0
   }
 
   async init() {
@@ -307,7 +312,13 @@ module.exports = class extends Base {
       client_version_string: clientVersionString,
       tag: 'cn',
     })
-    access_token = res.access_token
+    if (res && res.access_token) {
+      access_token = res.access_token
+    } else if (retryTimes < 5) {
+      await this.createConnection()
+      retryTimes++
+      await this.majsoulLogin()
+    }
   }
 
   // 雀魂token检测有效性
