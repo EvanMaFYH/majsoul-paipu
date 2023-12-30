@@ -18,14 +18,19 @@ export default {
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'majsoul-web',
+    title: '雀魂牌谱积分工具',
     htmlAttrs: {
       lang: 'zh-CN',
     },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: '' },
+      {
+        name: 'description',
+        content:
+          '雀魂牌谱积分工具，友人场打完统计积分，根据导入的牌谱按照日期排序导出积分统计excel',
+      },
+      { name: 'keywords', content: '雀魂,牌谱,积分,工具' },
       { name: 'format-detection', content: 'telephone=no' },
       { name: 'renderer', content: 'webkit|ie-comp|ie-stand' },
       { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge,chrome=1' },
@@ -34,10 +39,7 @@ export default {
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: [
-    '@/assets/element-variables.scss',
-    '@/assets/main.scss',
-  ],
+  css: ['@/assets/element-variables.scss', '@/assets/main.scss'],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: ['@/plugins/element-ui'],
@@ -49,7 +51,7 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/eslint
     '@nuxtjs/eslint-module',
-    '@nuxtjs/style-resources'
+    '@nuxtjs/style-resources',
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
