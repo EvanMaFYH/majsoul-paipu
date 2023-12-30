@@ -320,6 +320,9 @@ module.exports = class extends Base {
     if (res && res.access_token) {
       access_token = res.access_token
     } else if (retryTimes < 5) {
+      if (ws) {
+        ws.terminate()
+      }
       await this.createConnection()
       retryTimes++
       await this.majsoulLogin()
