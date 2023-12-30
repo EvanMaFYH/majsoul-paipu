@@ -227,10 +227,15 @@ module.exports = class extends Base {
       ws = new WebSocket(think.config('majsoulWssUrl'), {
         perMessageDeflate: false,
       })
-      ws.on('error', (err) => {
+      ws.on('error', (error) => {
+        console.log('------------error-------------')
         console.log(error)
         isConnect = false
-        reject(err)
+        reject(error)
+      })
+      ws.on('close', () => {
+        console.log('------------close-------------')
+        isConnect = false
       })
       ws.on('open', async function open() {
         isConnect = true
