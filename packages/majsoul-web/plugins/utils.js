@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import _clonedeep from 'lodash.clonedeep'
 import { MessageBox } from 'element-ui'
+const FileSaver = require('file-saver')
 
 const {
   isArray,
@@ -143,5 +144,8 @@ export default {
   },
   joinPath(path1, path2) {
     return `${path1.replace(/\/+$/, '')}/${path2}`
+  },
+  downloadFile(data, fileName) {
+    FileSaver.saveAs(data, fileName)
   },
 }

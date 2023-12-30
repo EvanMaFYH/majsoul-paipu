@@ -1,3 +1,4 @@
+const fs = require('fs')
 const axios = require('axios')
 var protobuf = require('protobufjs')
 const WebSocket = require('ws')
@@ -5,7 +6,9 @@ const uuidv4 = require('uuid/v4')
 const hmacSHA512 = require('crypto-js/hmac-sha256')
 const _isBuffer = require('lodash.isbuffer')
 const _uniqBy = require('lodash.uniqby')
+const ExcelJS = require('exceljs')
 const Base = require('../base')
+const util = require('../../util')
 let protobufRoot,
   protobufWrapper,
   ws,
@@ -70,14 +73,10 @@ module.exports = class extends Base {
     }
   }
 
+  // 相同四个人牌谱统计算分
   async postAction() {
     const { paipuList } = this.post()
-    let uuidList = []
-    if (Array.isArray(paipuList) && paipuList.length > 0) {
-      paipuList.forEach((uuid) => {
-        uuidList.push(this.formatUuid(uuid))
-      })
-    }
+    const uuidList = this.getUuidList(paipuList)
     if (uuidList.length > 0) {
       const res = await this.websocketRequest(
         '.lq.Lobby.fetchGameRecordsDetail',
@@ -98,6 +97,94 @@ module.exports = class extends Base {
     } else {
       this.success(null)
     }
+  }
+
+  // 牌谱积分统计
+  async statisticAction() {
+    const file = this.file('file')
+    let paipuList = []
+    if (file) {
+      const fileContent = fs.readFileSync(file.path, { encoding: 'utf-8' })
+      if (fileContent) {
+        paipuList = fileContent.split('\n')
+      }
+    }
+    const uuidList = this.getUuidList(paipuList)
+    const res = await this.websocketRequest(
+      '.lq.Lobby.fetchGameRecordsDetail',
+      {
+        uuid_list: uuidList,
+      }
+    )
+    if (res && res.record_list && res.record_list.length > 0) {
+      // 牌谱去重
+      const recordList = _uniqBy(res.record_list, 'uuid')
+      let playerList = []
+      const gameList = recordList
+        .sort((a, b) => a.start_time - b.start_time)
+        .map((item) => {
+          const formatRecord = this.formatPaipuRecord(item)
+          playerList = playerList.concat(
+            formatRecord.map((item) => ({
+              accountId: item.accountId,
+              nickName: item.nickName,
+            }))
+          )
+          return {
+            gameDate: util.toDate(item.start_time * 1000),
+            gameInfo: formatRecord,
+          }
+        })
+      const uniquePlayerList = _uniqBy(playerList, 'accountId').sort(
+        (a, b) => a.accountId - b.accountId
+      )
+      const buffer = await this.generateExcel(uniquePlayerList, gameList)
+      this.header('response-type', 'application/octet-stream')
+      this.header('Access-Control-Expose-Headers', 'filename')
+      this.header(
+        'Content-Disposition',
+        `attachment; filename=${encodeURI('牌谱统计')}.xlsx`
+      )
+      this.header('filename', `${encodeURI('牌谱统计')}.xlsx`)
+      this.body = buffer
+    }
+  }
+
+  // 根据牌谱以及所有牌谱涉及到的用户导出excel
+  async generateExcel(playerList, gameList) {
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('My Sheet')
+    const columns = playerList.map((item) => ({
+      header: item.nickName,
+      key: item.accountId,
+    }))
+    columns.unshift({ header: '日期', key: 'date' })
+    worksheet.columns = columns
+    gameList.forEach((item) => {
+      const playScore = playerList
+        .map((p) => p.accountId)
+        .reduce((total, current) => {
+          const userGameInfo = item.gameInfo.find(
+            (i) => i.accountId === current
+          )
+          total[current] = userGameInfo ? userGameInfo.finalScore : ''
+          return total
+        }, {})
+      worksheet.addRow({ date: item.gameDate, ...playScore })
+    })
+    const buffer = await workbook.xlsx.writeBuffer()
+    return buffer
+  }
+
+  // 根据牌谱列表获取uuid列表
+  getUuidList(paipuList) {
+    let uuidList = []
+    if (Array.isArray(paipuList) && paipuList.length > 0) {
+      paipuList.forEach((uuid) => {
+        uuidList.push(this.formatUuid(uuid))
+      })
+    }
+    return uuidList
   }
 
   // 根据牌谱获取uuid
@@ -121,6 +208,7 @@ module.exports = class extends Base {
     return null
   }
 
+  // 将某一个牌谱转换为一个数组，数组的每一项由参与者以及最终得分组成
   formatPaipuRecord(record) {
     // 去除无用参数并且根据用户id排序
     const playerList = record.accounts

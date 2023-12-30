@@ -14,6 +14,8 @@
   "dependencies": {
     "axios": "^0.19.2",
     "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.10",
+    "exceljs": "^4.4.0",
     "lodash.isarraybuffer": "^4.4.1",
     "lodash.isbuffer": "^4.3.4",
     "lodash.uniqby": "^4.7.0",

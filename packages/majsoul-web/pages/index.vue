@@ -24,6 +24,16 @@
           <el-button type="primary" :loading="loading" @click="submit"
             >提交</el-button
           >
+          <el-upload
+            action=""
+            :http-request="onUpload"
+            :show-file-list="false"
+            style="display: inline-block"
+          >
+            <el-button type="primary" :loading="loading"
+              >牌谱得分统计（上传txt）</el-button
+            >
+          </el-upload>
         </div>
       </div>
       <el-table
@@ -31,6 +41,7 @@
         :data="resultList"
         show-summary
         :summary-method="getSummaries"
+        style="margin-top: 10px"
       >
         <el-table-column
           label="序号"
@@ -49,6 +60,7 @@
 </template>
 
 <script>
+import utils from '@/plugins/utils'
 export default {
   data() {
     return {
@@ -119,6 +131,25 @@ export default {
         }
       })
       return sums
+    },
+    async onUpload(e) {
+      const formData = new FormData()
+      formData.append('file', e.file)
+      this.loading = true
+      const { code, data, headers } = await this.$http.request(
+        '/api/paipu/statistic',
+        {
+          method: 'post',
+          contentType: 'multipart/form-data',
+          responseType: 'blob',
+          data: formData,
+        }
+      )
+      if (code === 0) {
+        utils.downloadFile(data, decodeURI(headers.filename))
+        this.$message.success('统计数据下载成功')
+      }
+      this.loading = false
     },
   },
 }

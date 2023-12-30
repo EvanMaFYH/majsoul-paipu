@@ -1,3 +1,4 @@
 module.exports = [
-    [/\/api\/(\S+)(?:\/(\S+))?/, '/api/:1?id=:2', 'rest'],
-];
+  ['/api/paipu/statistic', '/api/paipu/statistic', 'post'],
+  [/\/api\/(\S+)(?:\/(\S+))?/, '/api/:1?id=:2', 'rest'],
+]
