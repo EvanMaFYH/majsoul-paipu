@@ -52,14 +52,21 @@ module.exports = class extends Base {
     if (!protobufRoot) {
       versionInfo = await this.majsoulRequest('version.json')
       clientVersionString =
-        'web-' + versionInfo.version.replace(/\.[a-z]+$/i, '')
-      const resInfo = await this.majsoulRequest(
-        `resversion${versionInfo.version}.json`
-      )
-      const pbVersion = resInfo.res['res/proto/liqi.json'].prefix
-      const liqiJson = await this.majsoulRequest(
-        `${pbVersion}/res/proto/liqi.json`
-      )
+          'web-' + versionInfo.version.replace(/\.[a-z]+$/i, '')
+      let liqiJson = null
+      const liqiCache = await this.cache(versionInfo.version)
+      if (!liqiCache) {
+        const resInfo = await this.majsoulRequest(
+          `resversion${versionInfo.version}.json`
+        )
+        const pbVersion = resInfo.res['res/proto/liqi.json'].prefix
+        liqiJson = await this.majsoulRequest(`${pbVersion}/res/proto/liqi.json`)
+        await this.cache(versionInfo.version, liqiJson, {
+          timeout: 25 * 24 * 60 * 60 * 1000,
+        })
+      } else {
+        liqiJson = liqiCache
+      }
       this.protobufInit(liqiJson)
     }
     if (!isConnect) {
