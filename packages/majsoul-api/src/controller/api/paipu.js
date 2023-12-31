@@ -327,27 +327,23 @@ module.exports = class extends Base {
   // decode请求参数
   decodeMessage(buf) {
     const type = buf[0]
-    const reqIndex = buf[1] | (buf[2] << 8)
-    const msg = protobufWrapper.decode(buf.slice(3))
-    let typeObj, methodName
-    if (type === 2) {
-      methodName = msg.name
-      const methodObj = this.lookupMethod(msg.name)
-      const typeName = methodObj.requestType
-      typeObj = methodObj.parent.parent.lookupType(typeName)
-    } else {
+    if (type === 3) {
+      const reqIndex = buf[1] | (buf[2] << 8)
+      const msg = protobufWrapper.decode(buf.slice(3))
+      let typeObj, methodName
       ;({ typeObj, methodName } = _inflightRequests[reqIndex] || {})
       if (!typeObj) {
         throw new Error(`Unknown request ${reqIndex}`)
       }
       delete _inflightRequests[reqIndex]
+      return {
+        type,
+        reqIndex,
+        methodName,
+        payload: typeObj.decode(msg.data),
+      }
     }
-    return {
-      type,
-      reqIndex,
-      methodName,
-      payload: typeObj.decode(msg.data),
-    }
+    return null
   }
 
   // 建立websocket连接
@@ -372,10 +368,9 @@ module.exports = class extends Base {
       })
       ws.on('message', (data) => {
         if (data && _isBuffer(data)) {
-          try {
-            messageQueue.push(this.decodeMessage(data))
-          } catch (e) {
-            console.log(e)
+          const decodeData = this.decodeMessage(data)
+          if (decodeData) {
+            messageQueue.push(decodeData)
           }
         }
       })
