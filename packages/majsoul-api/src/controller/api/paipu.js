@@ -458,7 +458,7 @@ module.exports = class extends Base {
       }
       heartBeatInterval = setInterval(() => {
         this.majsoulHeartBeat()
-      }, 10000)
+      }, 360000)
     } else if (retryTimes < 5) {
       if (ws) {
         ws.terminate()
