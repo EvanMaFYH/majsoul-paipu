@@ -21,6 +21,8 @@ let _index = 1
 let _inflightRequests = {}
 let messageQueue = []
 let retryTimes = 0
+let lastHeatBeatTime = null
+let heartBeatInterval = null
 const DEVICE_INFO = {
   platform: 'pc',
   hardware: 'pc',
@@ -370,7 +372,11 @@ module.exports = class extends Base {
       })
       ws.on('message', (data) => {
         if (data && _isBuffer(data)) {
-          messageQueue.push(this.decodeMessage(data))
+          try {
+            messageQueue.push(this.decodeMessage(data))
+          } catch (e) {
+            console.log(e)
+          }
         }
       })
     })
@@ -446,6 +452,13 @@ module.exports = class extends Base {
     })
     if (res && res.access_token) {
       access_token = res.access_token
+      if (heartBeatInterval) {
+        clearInterval(heartBeatInterval)
+        heartBeatInterval = null
+      }
+      heartBeatInterval = setInterval(() => {
+        this.majsoulHeartBeat()
+      }, 10000)
     } else if (retryTimes < 5) {
       if (ws) {
         ws.terminate()
@@ -478,6 +491,17 @@ module.exports = class extends Base {
       list = res.record_list
     }
     return list
+  }
+
+  async majsoulHeartBeat() {
+    const currentTime = new Date().getTime()
+    const no_operation_counter = lastHeatBeatTime
+      ? currentTime - lastHeatBeatTime
+      : 0
+    await this.websocketRequest('.lq.Lobby.heatbeat', {
+      no_operation_counter,
+    })
+    lastHeatBeatTime = currentTime
   }
 
   // async majsoulOauth2Login() {
