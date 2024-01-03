@@ -20,7 +20,6 @@ let protobufRoot,
 let _index = 1
 let _inflightRequests = {}
 let messageQueue = []
-let retryTimes = 0
 let lastHeatBeatTime = null
 let heartBeatInterval = null
 const DEVICE_INFO = {
@@ -39,11 +38,8 @@ module.exports = class extends Base {
     })
   }
 
-  __after() {
-    retryTimes = 0
-  }
-
   async init() {
+    this.retryTimes = 0
     if (!majsoulHttp) {
       majsoulHttp = axios.create({
         baseURL: think.config('majsoulBaseUrl'),
@@ -52,7 +48,7 @@ module.exports = class extends Base {
     if (!protobufRoot) {
       versionInfo = await this.majsoulRequest('version.json')
       clientVersionString =
-          'web-' + versionInfo.version.replace(/\.[a-z]+$/i, '')
+        'web-' + versionInfo.version.replace(/\.[a-z]+$/i, '')
       let liqiJson = null
       const liqiCache = await this.cache(versionInfo.version)
       if (!liqiCache) {
@@ -461,12 +457,12 @@ module.exports = class extends Base {
       heartBeatInterval = setInterval(() => {
         this.majsoulHeartBeat()
       }, 360000)
-    } else if (retryTimes < 5) {
+    } else if (this.retryTimes < 5) {
       if (ws) {
         ws.terminate()
       }
       await this.createConnection()
-      retryTimes++
+      this.retryTimes++
       await this.majsoulLogin()
     }
   }
