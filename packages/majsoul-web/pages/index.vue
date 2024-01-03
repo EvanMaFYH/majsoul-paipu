@@ -28,6 +28,7 @@
             action=""
             :http-request="onUpload"
             :show-file-list="false"
+            accept=".txt"
             style="display: inline-block"
           >
             <el-button type="primary" :loading="loading"
