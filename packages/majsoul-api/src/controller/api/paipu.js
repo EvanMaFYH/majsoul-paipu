@@ -450,13 +450,13 @@ module.exports = class extends Base {
     })
     if (res && res.access_token) {
       access_token = res.access_token
-      if (heartBeatInterval) {
-        clearInterval(heartBeatInterval)
-        heartBeatInterval = null
-      }
-      heartBeatInterval = setInterval(() => {
-        this.majsoulHeartBeat()
-      }, 360000)
+      // if (heartBeatInterval) {
+      //   clearInterval(heartBeatInterval)
+      //   heartBeatInterval = null
+      // }
+      // heartBeatInterval = setInterval(() => {
+      //   this.majsoulHeartBeat()
+      // }, 360000)
     } else if (this.retryTimes < 5) {
       if (ws) {
         ws.terminate()
