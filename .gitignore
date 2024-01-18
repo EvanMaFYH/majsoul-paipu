@@ -91,7 +91,7 @@ sw.*
 *.swp
 
 # single lock file use npm
-yarn.lock
+package-lock.json
 *.history
 
 # output
