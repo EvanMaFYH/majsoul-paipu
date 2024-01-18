@@ -11,6 +11,16 @@
             <i class="el-icon-warning"></i>
           </el-tooltip>
         </el-form-item>
+        <el-form-item prop="type" label="牌谱类型：">
+          <el-radio-group v-model="form.type">
+            <el-radio
+              v-for="item in typeList"
+              :key="item.value"
+              :label="item.value"
+              >{{ item.label }}</el-radio
+            >
+          </el-radio-group>
+        </el-form-item>
         <el-form-item prop="startDate" label="开始日期：">
           <el-date-picker
             v-model="form.startDate"
@@ -38,8 +48,16 @@ import utils from '@/plugins/utils'
 export default {
   data() {
     return {
-      form: {},
+      form: {
+        type: 1,
+      },
       loading: false,
+      typeList: [
+        { label: '全部', value: 0 },
+        { label: '友人场', value: 1 },
+        { label: '段位场', value: 2 },
+        { label: '比赛场', value: 4 },
+      ],
       rules: {
         username: {
           required: true,
@@ -50,6 +68,10 @@ export default {
           required: true,
           message: '请输入雀魂密码',
           trigger: 'blur',
+        },
+        type: {
+          required: true,
+          message: '请选择牌谱类型',
         },
       },
     }
