@@ -1,62 +1,60 @@
 <template>
   <div class="page-home">
-    <div class="page-home-content">
-      <div class="paipu-form">
-        <div class="paipu-form__action">
-          <el-button type="primary" @click="newLine">添加一行</el-button>
-        </div>
-        <div class="paipu-form__content">
-          <div
-            v-for="(item, index) in paipuList"
-            :key="index"
-            class="paipu-form__line"
-          >
-            <el-input v-model="item.value" placeholder="请输入牌谱"></el-input>
-            <el-button
-              type="danger"
-              icon="el-icon-delete"
-              circle
-              @click="deleteLine(index)"
-            ></el-button>
-          </div>
-        </div>
-        <div class="paipu-form__submit">
-          <el-button type="primary" :loading="loading" @click="submit"
-            >提交</el-button
-          >
-          <el-upload
-            action=""
-            :http-request="onUpload"
-            :show-file-list="false"
-            accept=".txt"
-            style="display: inline-block"
-          >
-            <el-button type="primary" :loading="loading"
-              >牌谱得分统计（上传txt）</el-button
-            >
-          </el-upload>
+    <div class="paipu-form">
+      <div class="paipu-form__action">
+        <el-button type="primary" @click="newLine">添加一行</el-button>
+      </div>
+      <div class="paipu-form__content">
+        <div
+          v-for="(item, index) in paipuList"
+          :key="index"
+          class="paipu-form__line"
+        >
+          <el-input v-model="item.value" placeholder="请输入牌谱"></el-input>
+          <el-button
+            type="danger"
+            icon="el-icon-delete"
+            circle
+            @click="deleteLine(index)"
+          ></el-button>
         </div>
       </div>
-      <el-table
-        v-if="resultList.length > 0"
-        :data="resultList"
-        show-summary
-        :summary-method="getSummaries"
-        style="margin-top: 10px"
-      >
-        <el-table-column
-          label="序号"
-          type="index"
-          width="100px"
-        ></el-table-column>
-        <el-table-column
-          v-for="(player, index) in resultList[0]"
-          :key="index"
-          :label="player.nickName"
-          :formatter="(row) => row[index].finalScore"
-        ></el-table-column>
-      </el-table>
+      <div class="paipu-form__submit">
+        <el-button type="primary" :loading="loading" @click="submit"
+          >提交</el-button
+        >
+        <el-upload
+          action=""
+          :http-request="onUpload"
+          :show-file-list="false"
+          accept=".txt"
+          style="display: inline-block"
+        >
+          <el-button type="primary" :loading="loading"
+            >牌谱得分统计（上传txt）</el-button
+          >
+        </el-upload>
+      </div>
     </div>
+    <el-table
+      v-if="resultList.length > 0"
+      :data="resultList"
+      show-summary
+      :summary-method="getSummaries"
+      style="margin-top: 10px"
+    >
+      <el-table-column
+        label="序号"
+        type="index"
+        width="100px"
+      ></el-table-column>
+      <el-table-column
+        v-for="(player, index) in resultList[0]"
+        :key="index"
+        :label="player.nickName"
+        :formatter="(row) => row[index].finalScore"
+      ></el-table-column>
+    </el-table>
   </div>
 </template>
 
@@ -68,6 +66,11 @@ export default {
       loading: false,
       paipuList: [{ value: '' }],
       resultList: [],
+    }
+  },
+  head() {
+    return {
+      title: '牌谱算分/统计',
     }
   },
   methods: {
@@ -157,11 +160,8 @@ export default {
 </script>
 <style lang="scss" scoped>
 .page-home {
-  padding: 30px 0;
-  &-content {
-    width: $page-main-width;
-    margin: 0 auto;
-  }
+  background-color: #fff;
+  padding: $page-padding;
   .paipu-form {
     &__action {
       margin-bottom: 10px;
@@ -169,14 +169,12 @@ export default {
     &__submit {
       margin-top: 30px;
     }
-    &__content {
-    }
     &__line {
       display: flex;
       align-items: center;
       margin-bottom: 10px;
       .el-input {
-        flex: 1;
+        width: 400px;
         margin-right: 10px;
       }
     }

@@ -39,7 +39,12 @@ export default {
   },
 
   // Global CSS: https://go.nuxtjs.dev/config-css
-  css: ['@/assets/element-variables.scss', '@/assets/main.scss'],
+  css: [
+    '@/assets/element-variables.scss',
+    'font-awesome/css/font-awesome.min.css',
+    '@/assets/main.scss',
+    '@/assets/transition.scss',
+  ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: ['@/plugins/element-ui'],

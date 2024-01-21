@@ -1,45 +1,43 @@
 <template>
   <div class="download-paipu">
-    <div class="download-paipu-content">
-      <el-form ref="form" :model="form" :rules="rules" label-width="auto">
-        <el-form-item prop="username" label="雀魂账号：">
-          <el-input v-model="form.username"></el-input>
-        </el-form-item>
-        <el-form-item prop="password" label="雀魂密码：">
-          <el-input v-model="form.password" type="password"></el-input>
-          <el-tooltip effect="dark" content="如担心密码泄漏请勿使用该功能">
-            <i class="el-icon-warning"></i>
-          </el-tooltip>
-        </el-form-item>
-        <el-form-item prop="type" label="牌谱类型：">
-          <el-radio-group v-model="form.type">
-            <el-radio
-              v-for="item in typeList"
-              :key="item.value"
-              :label="item.value"
-              >{{ item.label }}</el-radio
-            >
-          </el-radio-group>
-        </el-form-item>
-        <el-form-item prop="startDate" label="开始日期：">
-          <el-date-picker
-            v-model="form.startDate"
-            value-format="yyyy-MM-dd"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item prop="endDate" label="结束日期：">
-          <el-date-picker
-            v-model="form.endDate"
-            value-format="yyyy-MM-dd"
-          ></el-date-picker>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :loading="loading" @click="exportTxt"
-            >导出牌谱txt</el-button
+    <el-form ref="form" :model="form" :rules="rules" label-width="auto">
+      <el-form-item prop="username" label="雀魂账号：">
+        <el-input v-model="form.username"></el-input>
+      </el-form-item>
+      <el-form-item prop="password" label="雀魂密码：">
+        <el-input v-model="form.password" type="password"></el-input>
+        <el-tooltip effect="dark" content="如担心密码泄漏请勿使用该功能">
+          <i class="el-icon-warning"></i>
+        </el-tooltip>
+      </el-form-item>
+      <el-form-item prop="type" label="牌谱类型：">
+        <el-radio-group v-model="form.type">
+          <el-radio
+            v-for="item in typeList"
+            :key="item.value"
+            :label="item.value"
+            >{{ item.label }}</el-radio
           >
-        </el-form-item>
-      </el-form>
-    </div>
+        </el-radio-group>
+      </el-form-item>
+      <el-form-item prop="startDate" label="开始日期：">
+        <el-date-picker
+          v-model="form.startDate"
+          value-format="yyyy-MM-dd"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item prop="endDate" label="结束日期：">
+        <el-date-picker
+          v-model="form.endDate"
+          value-format="yyyy-MM-dd"
+        ></el-date-picker>
+      </el-form-item>
+      <el-form-item>
+        <el-button type="primary" :loading="loading" @click="exportTxt"
+          >导出牌谱txt</el-button
+        >
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
@@ -112,18 +110,15 @@ export default {
 
 <style lang="scss" scoped>
 .download-paipu {
-  padding: 30px 0;
-  &-content {
-    width: 1200px;
-    margin: 0 auto;
-    .el-input {
-      width: 250px;
-    }
-    .el-icon-warning {
-      color: #f56c6c;
-      font-size: 18px;
-      margin-left: 6px;
-    }
+  background-color: #fff;
+  padding: $page-padding;
+  .el-input {
+    width: 250px;
+  }
+  .el-icon-warning {
+    color: #f56c6c;
+    font-size: 18px;
+    margin-left: 6px;
   }
 }
 </style>
