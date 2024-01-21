@@ -174,8 +174,12 @@ export default class {
   }
 
   onErrorMessage(res) {
-    if (res.errmsg && typeof res.errmsg === 'string') {
-      this.showErrorMessage(res.errmsg)
+    if (res.errmsg) {
+      if (typeof res.errmsg === 'string') {
+        this.showErrorMessage(res.errmsg)
+      } else if (utils.isObject(res.errmsg)) {
+        this.showErrorMessage(Object.values(res.errmsg)[0])
+      }
     }
   }
 }

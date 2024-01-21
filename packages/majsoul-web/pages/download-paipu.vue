@@ -73,6 +73,10 @@ export default {
           required: true,
           message: '请选择牌谱类型',
         },
+        startDate: {
+          required: true,
+          message: '请选择开始日期',
+        },
       },
     }
   },
@@ -92,6 +96,7 @@ export default {
               method: 'post',
               data: this.form,
               responseType: 'blob',
+              timeout: 60000,
             }
           )
           if (code === 0) {

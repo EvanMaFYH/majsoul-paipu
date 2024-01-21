@@ -207,6 +207,10 @@ module.exports = class extends Majsoul {
             (item) => util.toDate(item.start_time * 1000) >= startDate
           );
         }
+        // 分页查询雀魂牌谱时防止牌谱总数过多查询次数太多导致接口超时，限制开始日期必填，当某次分页查询出的牌谱开始日期都小于输入的开始日期时结束分页查询
+        if (paipu.length === 0) {
+          flag = false;
+        }
         if (endDate) {
           paipu = paipu.filter(
             (item) => util.toDate(item.end_time * 1000) <= endDate
