@@ -1,6 +1,7 @@
 module.exports = class extends think.Logic {
   __before() {
-    this.header('Access-Control-Allow-Origin', '*');
+    const allowOrigin = think.config('allowOrigin') || '*';
+    this.header('Access-Control-Allow-Origin', allowOrigin);
     this.header('Access-Control-Allow-Headers', 'x-requested-with,content-type');
     this.header('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,DELETE');
     this.header('Access-Control-Allow-Credentials', true);
