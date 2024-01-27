@@ -22,16 +22,19 @@ module.exports = class extends Base {
   }
 
   async recordIp() {
-    const ip = this.ctx.request.ip;
-    let ipList = await this.cache('requestIpList');
-    if (!Array.isArray(ipList)) {
-      ipList = [];
+    const method = this.method.toLowerCase();
+    if (method !== 'options') {
+      const ip = this.ctx.request.ip;
+      let ipList = await this.cache('requestIpList');
+      if (!Array.isArray(ipList)) {
+        ipList = [];
+      }
+      ipList.push({
+        ip,
+        time: util.toDateTime(new Date())
+      });
+      await this.cache('requestIpList', ipList, {timeout: 1000000 * 24 * 60 * 60 * 1000});
     }
-    ipList.push({
-      ip,
-      time: util.toDateTime(new Date())
-    });
-    await this.cache('requestIpList', ipList, {timeout: 1000000 * 24 * 60 * 60 * 1000});
   }
 
   async initJson() {
