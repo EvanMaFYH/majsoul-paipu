@@ -1,6 +1,7 @@
 const Base = require('./base');
 const axios = require('axios');
 const protobuf = require('protobufjs');
+const util = require('../util');
 
 const DEVICE_INFO = {
   platform: 'pc',
@@ -16,7 +17,21 @@ module.exports = class extends Base {
     return Promise.resolve(super.__before()).then(async() => {
       await this.initJson();
       this.deviceInfo = DEVICE_INFO;
+      await this.recordIp();
     });
+  }
+
+  async recordIp() {
+    const ip = this.ctx.request.ip;
+    let ipList = await this.cache('requestIpList');
+    if (!Array.isArray(ipList)) {
+      ipList = [];
+    }
+    ipList.push({
+      ip,
+      time: util.toDateTime(new Date())
+    });
+    await this.cache('requestIpList', ipList, {timeout: 1000000 * 24 * 60 * 60 * 1000});
   }
 
   async initJson() {

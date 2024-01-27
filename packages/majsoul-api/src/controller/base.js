@@ -14,18 +14,5 @@ module.exports = class extends think.Controller {
       this.ctx.body = 200;
       return false;
     }
-    this.recordIp();
-  }
-  async recordIp() {
-    const ip = this.ctx.request.ip;
-    let ipList = await this.cache('requestIpList');
-    if (!Array.isArray(ipList)) {
-      ipList = [];
-    }
-    ipList.push({
-      ip,
-      time: util.toDateTime(new Date())
-    });
-    await this.cache('requestIpList', ipList, {timeout: 1000000 * 24 * 60 * 60 * 1000});
   }
 };
