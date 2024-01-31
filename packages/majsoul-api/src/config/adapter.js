@@ -42,7 +42,7 @@ exports.model = {
     host: '106.14.123.210',
     port: '3306',
     user: 'root',
-    password: 'M@yuef@n1993',
+    password: '',
     dateStrings: true
   }
 };
