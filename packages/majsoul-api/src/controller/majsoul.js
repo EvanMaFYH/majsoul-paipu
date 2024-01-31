@@ -22,7 +22,10 @@ module.exports = class extends Base {
 
   __after() {
     if (think.config('enableLog')) {
-      this.saveRequestLog();
+      const method = this.method.toLowerCase();
+      if (method !== 'options') {
+        this.saveRequestLog();
+      }
     }
   }
 
