@@ -17,24 +17,24 @@ module.exports = class extends Base {
     return Promise.resolve(super.__before()).then(async() => {
       await this.initJson();
       this.deviceInfo = DEVICE_INFO;
-      await this.recordIp();
     });
   }
 
-  async recordIp() {
-    const method = this.method.toLowerCase();
-    if (method !== 'options') {
-      const ip = this.ctx.request.ip;
-      let ipList = await this.cache('requestIpList');
-      if (!Array.isArray(ipList)) {
-        ipList = [];
-      }
-      ipList.push({
-        ip,
-        time: util.toDateTime(new Date())
-      });
-      await this.cache('requestIpList', ipList, {timeout: 1000000 * 24 * 60 * 60 * 1000});
+  __after() {
+    if (think.config('enableLog')) {
+      this.saveRequestLog();
     }
+  }
+
+  saveRequestLog() {
+    const model = this.model('t_log');
+    model.add({
+      request_ip: this.ip,
+      user_agent: this.userAgent,
+      request_method: this.method,
+      request_url: this.ctx.url,
+      request_time: util.toDateTime(new Date())
+    });
   }
 
   async initJson() {
