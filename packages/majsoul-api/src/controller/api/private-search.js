@@ -1,3 +1,4 @@
+const {execSync} = require('child_process');
 const Base = require('../base');
 module.exports = class extends Base {
   async requestIpAction() {
@@ -6,5 +7,10 @@ module.exports = class extends Base {
     const size = this.get('size') || 10;
     const ipList = await model.page(page, size).countSelect();
     this.success(ipList);
+  }
+  reloadSelfAction() {
+    if (this.get('user') === 'mayf') {
+      execSync('pm2 reload 0');
+    }
   }
 };
