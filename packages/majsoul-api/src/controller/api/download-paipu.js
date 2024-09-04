@@ -83,7 +83,7 @@ module.exports = class extends Majsoul {
     const responseType = methodObj.parent.parent.lookupType(
       methodObj.responseType
     );
-    const msg = think.app.protobufWrapper
+    const msg = this.protobufWrapper
       .encode({
         name: methodName,
         data: requestType.encode(payload).finish()
@@ -107,7 +107,7 @@ module.exports = class extends Majsoul {
     const type = buf[0];
     if (type === 3) {
       const reqIndex = buf[1] | (buf[2] << 8);
-      const msg = think.app.protobufWrapper.decode(buf.slice(3));
+      const msg = this.protobufWrapper.decode(buf.slice(3));
       const { typeObj, methodName } = this._inflightRequests[reqIndex] || {};
       if (!typeObj) {
         throw new Error(`Unknown request ${reqIndex}`);
@@ -166,12 +166,12 @@ module.exports = class extends Majsoul {
       device: this.deviceInfo,
       random_key: uuidv4(),
       client_version: {
-        resource: think.app.versionInfo.version
+        resource: this.versionInfo.version
       },
       gen_access_token: true,
       type: 0,
       currency_platforms: [],
-      client_version_string: think.app.clientVersionString,
+      client_version_string: this.clientVersionString,
       tag: 'cn'
     });
     if (res && res.error) {

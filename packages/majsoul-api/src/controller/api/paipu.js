@@ -1,15 +1,13 @@
-const fs = require('fs');
-const WebSocket = require('ws');
-const uuidv4 = require('uuid/v4');
-const hmacSHA512 = require('crypto-js/hmac-sha256');
-const _isBuffer = require('lodash.isbuffer');
-const _uniqBy = require('lodash.uniqby');
-const ExcelJS = require('exceljs');
-const Majsoul = require('../majsoul');
-const util = require('../../util');
-let ws,
-  isConnect,
-  access_token;
+const fs = require("fs");
+const WebSocket = require("ws");
+const uuidv4 = require("uuid/v4");
+const hmacSHA512 = require("crypto-js/hmac-sha256");
+const _isBuffer = require("lodash.isbuffer");
+const _uniqBy = require("lodash.uniqby");
+const ExcelJS = require("exceljs");
+const Majsoul = require("../majsoul");
+const util = require("../../util");
+let ws, isConnect, access_token;
 let _index = 1;
 const _inflightRequests = {};
 const messageQueue = [];
@@ -17,7 +15,7 @@ let lastHeatBeatTime = null;
 const heartBeatInterval = null;
 module.exports = class extends Majsoul {
   __before() {
-    return Promise.resolve(super.__before()).then(async() => {
+    return Promise.resolve(super.__before()).then(async () => {
       await this.init();
     });
   }
@@ -43,14 +41,14 @@ module.exports = class extends Majsoul {
     const uuidList = this.getUuidList(paipuList);
     if (uuidList.length > 0) {
       const res = await this.websocketRequest(
-        '.lq.Lobby.fetchGameRecordsDetail',
+        ".lq.Lobby.fetchGameRecordsDetail",
         {
-          uuid_list: uuidList
+          uuid_list: uuidList,
         }
       );
       if (res && res.record_list && res.record_list.length > 0) {
         // 牌谱去重
-        const recordList = _uniqBy(res.record_list, 'uuid');
+        const recordList = _uniqBy(res.record_list, "uuid");
         const formatList = recordList.map((item) =>
           this.formatPaipuRecord(item)
         );
@@ -65,24 +63,24 @@ module.exports = class extends Majsoul {
 
   // 牌谱积分统计
   async statisticAction() {
-    const file = this.file('file');
+    const file = this.file("file");
     let paipuList = [];
     if (file) {
-      const fileContent = fs.readFileSync(file.path, { encoding: 'utf-8' });
+      const fileContent = fs.readFileSync(file.path, { encoding: "utf-8" });
       if (fileContent) {
-        paipuList = fileContent.split('\n');
+        paipuList = fileContent.split("\n");
       }
     }
     const uuidList = this.getUuidList(paipuList);
     const res = await this.websocketRequest(
-      '.lq.Lobby.fetchGameRecordsDetail',
+      ".lq.Lobby.fetchGameRecordsDetail",
       {
-        uuid_list: uuidList
+        uuid_list: uuidList,
       }
     );
     if (res && res.record_list && res.record_list.length > 0) {
       // 牌谱去重
-      const recordList = _uniqBy(res.record_list, 'uuid');
+      const recordList = _uniqBy(res.record_list, "uuid");
       let playerList = [];
       const gameList = recordList
         .sort((a, b) => a.start_time - b.start_time)
@@ -91,25 +89,25 @@ module.exports = class extends Majsoul {
           playerList = playerList.concat(
             formatRecord.map((item) => ({
               accountId: item.accountId,
-              nickName: item.nickName
+              nickName: item.nickName,
             }))
           );
           return {
             gameDate: util.toDate(item.start_time * 1000),
-            gameInfo: formatRecord
+            gameInfo: formatRecord,
           };
         });
-      const uniquePlayerList = _uniqBy(playerList, 'accountId').sort(
+      const uniquePlayerList = _uniqBy(playerList, "accountId").sort(
         (a, b) => a.accountId - b.accountId
       );
       const buffer = await this.generateExcel(uniquePlayerList, gameList);
-      this.header('response-type', 'application/octet-stream');
-      this.header('Access-Control-Expose-Headers', 'filename');
+      this.header("response-type", "application/octet-stream");
+      this.header("Access-Control-Expose-Headers", "filename");
       this.header(
-        'Content-Disposition',
-        `attachment; filename=${encodeURI('牌谱统计')}.xlsx`
+        "Content-Disposition",
+        `attachment; filename=${encodeURI("牌谱统计")}.xlsx`
       );
-      this.header('filename', `${encodeURI('牌谱统计')}.xlsx`);
+      this.header("filename", `${encodeURI("牌谱统计")}.xlsx`);
       this.body = buffer;
     }
   }
@@ -117,13 +115,13 @@ module.exports = class extends Majsoul {
   // 根据牌谱以及所有牌谱涉及到的用户导出excel
   async generateExcel(playerList, gameList) {
     const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('My Sheet');
+    const worksheet = workbook.addWorksheet("My Sheet");
     const columns = playerList.map((item) => ({
       header: item.nickName,
       key: item.accountId,
-      width: 15
+      width: 15,
     }));
-    columns.unshift({ header: '日期', key: 'date', width: 15 });
+    columns.unshift({ header: "日期", key: "date", width: 15 });
     worksheet.columns = columns;
     gameList.forEach((item) => {
       const playScore = playerList
@@ -132,7 +130,7 @@ module.exports = class extends Majsoul {
           const userGameInfo = item.gameInfo.find(
             (i) => i.accountId === current
           );
-          total[current] = userGameInfo ? userGameInfo.finalScore : '';
+          total[current] = userGameInfo ? userGameInfo.finalScore : "";
           return total;
         }, {});
       worksheet.addRow({ date: item.gameDate, ...playScore });
@@ -160,14 +158,14 @@ module.exports = class extends Majsoul {
     if (this.isUuid(uuid)) {
       return uuid;
     }
-    if (uuid.includes('http')) {
-      if (!uuid.startsWith('http')) {
-        uuid = uuid.substring(uuid.indexOf('http'));
+    if (uuid.includes("http")) {
+      if (!uuid.startsWith("http")) {
+        uuid = uuid.substring(uuid.indexOf("http"));
       }
-      uuid = this.getQueryString(uuid, 'paipu');
+      uuid = this.getQueryString(uuid, "paipu");
     }
     if (uuid) {
-      uuid = uuid.split('_').shift();
+      uuid = uuid.split("_").shift();
     }
     return uuid;
   }
@@ -179,8 +177,8 @@ module.exports = class extends Majsoul {
 
   // 获取url的query参数
   getQueryString(url, key) {
-    const reg = new RegExp('(^|&)' + key + '=([^&]*)(&|$)');
-    const searchStr = url.split('?').pop();
+    const reg = new RegExp("(^|&)" + key + "=([^&]*)(&|$)");
+    const searchStr = url.split("?").pop();
     const r = searchStr.match(reg);
     if (r) {
       return decodeURIComponent(r[2]);
@@ -200,7 +198,7 @@ module.exports = class extends Majsoul {
           accountId: item.account_id,
           nickName: item.nickname,
           finalPoint: playerResult.part_point_1,
-          finalScore: playerResult.total_point / 1000
+          finalScore: playerResult.total_point / 1000,
         };
       })
       .sort((a, b) => a.accountId - b.accountId);
@@ -217,22 +215,22 @@ module.exports = class extends Majsoul {
     const responseType = methodObj.parent.parent.lookupType(
       methodObj.responseType
     );
-    const msg = think.app.protobufWrapper
+    const msg = this.protobufWrapper
       .encode({
         name: methodName,
-        data: requestType.encode(payload).finish()
+        data: requestType.encode(payload).finish(),
       })
       .finish();
     _inflightRequests[currentIndex] = {
       methodName,
-      typeObj: responseType
+      typeObj: responseType,
     };
     return {
       reqIndex: currentIndex,
       buffer: Buffer.concat([
         Buffer.from([2, currentIndex & 0xff, currentIndex >> 8]),
-        msg
-      ])
+        msg,
+      ]),
     };
   }
 
@@ -241,8 +239,8 @@ module.exports = class extends Majsoul {
     const type = buf[0];
     if (type === 3) {
       const reqIndex = buf[1] | (buf[2] << 8);
-      const msg = think.app.protobufWrapper.decode(buf.slice(3));
-      const {typeObj, methodName} = _inflightRequests[reqIndex] || {};
+      const msg = this.protobufWrapper.decode(buf.slice(3));
+      const { typeObj, methodName } = _inflightRequests[reqIndex] || {};
       if (!typeObj) {
         throw new Error(`Unknown request ${reqIndex}`);
       }
@@ -251,7 +249,7 @@ module.exports = class extends Majsoul {
         type,
         reqIndex,
         methodName,
-        payload: typeObj.decode(msg.data)
+        payload: typeObj.decode(msg.data),
       };
     }
     return null;
@@ -260,24 +258,24 @@ module.exports = class extends Majsoul {
   // 建立websocket连接
   createConnection() {
     return new Promise((resolve, reject) => {
-      ws = new WebSocket(think.config('majsoulWssUrl'), {
-        perMessageDeflate: false
+      ws = new WebSocket(think.config("majsoulWssUrl"), {
+        perMessageDeflate: false,
       });
-      ws.on('error', (error) => {
-        console.log('------------error-------------');
+      ws.on("error", (error) => {
+        console.log("------------error-------------");
         console.log(error);
         isConnect = false;
         reject(error);
       });
-      ws.on('close', () => {
-        console.log('------------close-------------');
+      ws.on("close", () => {
+        console.log("------------close-------------");
         isConnect = false;
       });
-      ws.on('open', async function open() {
+      ws.on("open", async function open() {
         isConnect = true;
         resolve();
       });
-      ws.on('message', (data) => {
+      ws.on("message", (data) => {
         if (data && _isBuffer(data)) {
           const decodeData = this.decodeMessage(data);
           if (decodeData) {
@@ -290,10 +288,10 @@ module.exports = class extends Majsoul {
 
   // 发送websoket请求
   websocketRequest(methodName, payload) {
-    return new Promise(async(resolve) => {
+    return new Promise(async (resolve) => {
       const encodeData = this.encodeRequest({
         methodName,
-        payload
+        payload,
       });
       ws.send(encodeData.buffer);
       const res = await this.getMessage(encodeData.reqIndex);
@@ -330,23 +328,23 @@ module.exports = class extends Majsoul {
 
   // 雀魂账号密码登录
   async majsoulLogin() {
-    const res = await this.websocketRequest('.lq.Lobby.login', {
-      account: think.config('majsoulUserName'),
+    const res = await this.websocketRequest(".lq.Lobby.login", {
+      account: think.config("majsoulUserName"),
       password: hmacSHA512(
-        think.config('majsoulPassword'),
-        'lailai'
+        think.config("majsoulPassword"),
+        "lailai"
       ).toString(),
       reconnect: true,
       device: this.deviceInfo,
       random_key: uuidv4(),
       client_version: {
-        resource: think.app.versionInfo.version
+        resource: this.versionInfo.version,
       },
       gen_access_token: true,
       type: 0,
       currency_platforms: [],
-      client_version_string: think.app.clientVersionString,
-      tag: 'cn'
+      client_version_string: this.clientVersionString,
+      tag: "cn",
     });
     if (res && res.access_token) {
       access_token = res.access_token;
@@ -358,6 +356,7 @@ module.exports = class extends Majsoul {
       //   this.majsoulHeartBeat()
       // }, 360000)
     } else if (this.retryTimes < 5) {
+      console.log("loginError", res);
       if (ws) {
         ws.terminate();
       }
@@ -369,9 +368,9 @@ module.exports = class extends Majsoul {
 
   // 雀魂token检测有效性
   async majsoulOauth2Check() {
-    const res = await this.websocketRequest('.lq.Lobby.oauth2Check', {
+    const res = await this.websocketRequest(".lq.Lobby.oauth2Check", {
       type: 0,
-      access_token
+      access_token,
     });
     return res ? res.has_account : false;
   }
@@ -381,8 +380,8 @@ module.exports = class extends Majsoul {
     const no_operation_counter = lastHeatBeatTime
       ? currentTime - lastHeatBeatTime
       : 0;
-    await this.websocketRequest('.lq.Lobby.heatbeat', {
-      no_operation_counter
+    await this.websocketRequest(".lq.Lobby.heatbeat", {
+      no_operation_counter,
     });
     lastHeatBeatTime = currentTime;
   }

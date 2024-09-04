@@ -46,19 +46,19 @@ module.exports = class extends Base {
         baseURL: think.config('majsoulBaseUrl')
       });
     }
-    if (!think.app.protobufRoot) {
-      think.app.versionInfo = await this.majsoulRequest('version.json');
-      think.app.clientVersionString =
-        'web-' + think.app.versionInfo.version.replace(/\.[a-z]+$/i, '');
+    if (!this.protobufRoot) {
+      this.versionInfo = await this.majsoulRequest('version.json');
+      this.clientVersionString =
+        'web-' + this.versionInfo.version.replace(/\.[a-z]+$/i, '');
       let liqiJson = null;
-      const liqiCache = await this.cache(think.app.versionInfo.version);
+      const liqiCache = await this.cache(this.versionInfo.version);
       if (!liqiCache) {
         const resInfo = await this.majsoulRequest(
-          `resversion${think.app.versionInfo.version}.json`
+          `resversion${this.versionInfo.version}.json`
         );
         const pbVersion = resInfo.res['res/proto/liqi.json'].prefix;
         liqiJson = await this.majsoulRequest(`${pbVersion}/res/proto/liqi.json`);
-        await this.cache(think.app.versionInfo.version, liqiJson, {
+        await this.cache(this.versionInfo.version, liqiJson, {
           timeout: 25 * 24 * 60 * 60 * 1000
         });
       } else {
@@ -69,8 +69,8 @@ module.exports = class extends Base {
   }
 
   protobufInit(json) {
-    think.app.protobufRoot = protobuf.Root.fromJSON(json);
-    think.app.protobufWrapper = think.app.protobufRoot.nested.lq.Wrapper;
+    this.protobufRoot = protobuf.Root.fromJSON(json);
+    this.protobufWrapper = this.protobufRoot.nested.lq.Wrapper;
     console.log('protobuf data load complete');
   }
 
@@ -87,7 +87,7 @@ module.exports = class extends Base {
     if (path.length === 0) {
       return null;
     }
-    const service = think.app.protobufRoot.lookupService(path.slice(0, -1));
+    const service = this.protobufRoot.lookupService(path.slice(0, -1));
     if (!service) {
       return null;
     }
