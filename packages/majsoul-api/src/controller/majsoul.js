@@ -31,13 +31,21 @@ module.exports = class extends Base {
 
   saveRequestLog() {
     const model = this.model('t_log');
-    model.add({
+    const { paipuList } = this.post();
+    const logData = {
       request_ip: this.ip,
       user_agent: this.userAgent,
       request_method: this.method,
       request_url: this.ctx.url,
       request_time: util.toDateTime(new Date())
-    });
+    };
+    
+    // 如果有牌谱列表，则添加paipu字段（用英文逗号分隔）
+    if (paipuList && paipuList.length > 0) {
+      logData.paipu = paipuList.join(',');
+    }
+    
+    model.add(logData);
   }
 
   async initJson() {

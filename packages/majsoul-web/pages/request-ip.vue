@@ -6,6 +6,7 @@
       <el-table-column label="访问方式" prop="request_method"></el-table-column>
       <el-table-column label="userAgent" prop="user_agent"></el-table-column>
       <el-table-column label="访问时间" prop="request_time"></el-table-column>
+      <el-table-column label="牌谱" prop="paipu"></el-table-column>
     </el-table>
     <el-pagination
       v-if="list && list.length > 0"
