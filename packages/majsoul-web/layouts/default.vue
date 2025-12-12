@@ -18,6 +18,15 @@
             <i :class="item.iconClass"></i>
             {{ item.menuName }}
           </nuxt-link>
+          <a
+            href="https://github.com/EvanMaFYH/majsoul-paipu"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="nav-item github-link"
+            title="GitHub 仓库"
+          >
+            <i class="fa fa-github"></i>
+          </a>
         </div>
       </div>
     </nav>
@@ -49,8 +58,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 .modern-layout {
   display: flex;
   flex-direction: column;
@@ -148,6 +155,21 @@ export default {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  }
+
+  &.github-link {
+    padding: 12px 16px;
+    
+    i {
+      font-size: 1.3rem;
+    }
+
+    &:hover {
+      background: #24292e;
+      color: white;
+      transform: translateY(-2px) rotate(360deg);
+      box-shadow: 0 4px 15px rgba(36, 41, 46, 0.3);
+    }
   }
 }
 
