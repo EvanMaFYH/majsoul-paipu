@@ -18,7 +18,8 @@ export default {
   },
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: '雀魂牌谱积分工具',
+    title: '雀魂工具箱 - 牌谱分析与下载 | 专业麻将数据统计平台',
+    titleTemplate: '%s',
     htmlAttrs: {
       lang: 'zh-CN',
     },
@@ -26,14 +27,22 @@ export default {
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       {
+        hid: 'description',
         name: 'description',
         content:
-          '雀魂牌谱积分工具，友人场打完统计积分，根据导入的牌谱按照日期排序导出积分统计excel',
+          '雀魂工具箱提供专业的牌谱分析和下载服务。支持多局对局分析、批量牌谱统计、Excel报表导出、友人场/段位场/比赛场牌谱下载，帮助玩家提升麻将技术。',
       },
-      { name: 'keywords', content: '雀魂,牌谱,积分,工具' },
+      {
+        hid: 'keywords',
+        name: 'keywords',
+        content:
+          '雀魂,牌谱分析,麻将统计,对局分析,牌谱下载,雀魂工具,麻将数据,Excel导出,批量统计,友人场,段位场,比赛场,majsoul',
+      },
       { name: 'format-detection', content: 'telephone=no' },
       { name: 'renderer', content: 'webkit|ie-comp|ie-stand' },
       { 'http-equiv': 'X-UA-Compatible', content: 'IE=edge,chrome=1' },
+      { name: 'author', content: '雀魂工具箱' },
+      { name: 'robots', content: 'index, follow' },
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
