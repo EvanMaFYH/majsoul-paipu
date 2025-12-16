@@ -37,6 +37,20 @@
         <nuxt />
       </transition>
     </main>
+
+    <!-- 底部页脚 -->
+    <footer class="footer">
+      <div class="footer-content">
+        <a 
+          href="https://beian.miit.gov.cn/" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          class="footer-link"
+        >
+          苏ICP备2025226895号
+        </a>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -217,6 +231,36 @@ export default {
 
     i {
       display: none;
+    }
+  }
+}
+
+.footer {
+  width: 100%;
+  padding: 20px 0;
+  margin-top: auto;
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(102, 126, 234, 0.1);
+  
+  .footer-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .footer-link {
+    color: #a0aec0;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      color: #667eea;
+      text-decoration: underline;
     }
   }
 }
