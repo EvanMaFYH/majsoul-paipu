@@ -41,13 +41,13 @@
     <!-- 底部页脚 -->
     <footer class="footer">
       <div class="footer-content">
-        <a 
-          href="https://beian.miit.gov.cn/" 
-          target="_blank" 
+        <a
+          href="https://beian.miit.gov.cn/"
+          target="_blank"
           rel="noopener noreferrer"
           class="footer-link"
         >
-          苏ICP备2025226895号
+          苏ICP备2025226895号-1
         </a>
       </div>
     </footer>
@@ -173,7 +173,7 @@ export default {
 
   &.github-link {
     padding: 12px 16px;
-    
+
     i {
       font-size: 1.3rem;
     }
@@ -242,7 +242,7 @@ export default {
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(102, 126, 234, 0.1);
-  
+
   .footer-content {
     max-width: 1400px;
     margin: 0 auto;
@@ -257,7 +257,7 @@ export default {
     text-decoration: none;
     font-size: 0.85rem;
     transition: all 0.3s ease;
-    
+
     &:hover {
       color: #667eea;
       text-decoration: underline;
